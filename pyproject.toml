@@ -17,6 +17,7 @@ dependencies = [
     "evaluate",
     "tqdm",
     "loguru",
+    "swanlab>=0.7.6",
 ]
 [project.optional-dependencies]
 cpu = [

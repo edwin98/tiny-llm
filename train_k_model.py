@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
     # 设置混合精度训练的上下文管理器
     # CPU训练时使用nullcontext，GPU训练时使用autocast
-    ctx = nullcontext() if device_type == "cpu" else torch.cuda.amp.autocast()
+    ctx = nullcontext() if device_type == "cpu" else torch.amp.autocast()
 
     # ==================== 模型和数据初始化 ====================
     # 初始化模型和分词器
@@ -331,10 +331,10 @@ if __name__ == "__main__":
     # ==================== 优化器和训练组件初始化 ====================
     # 初始化混合精度训练的梯度缩放器
     # 只有在使用float16或bfloat16时才启用
-    scaler = torch.cuda.amp.GradScaler(enabled=(args.dtype in ["float16", "bfloat16"]))
+    scaler = torch.amp.GradScaler(enabled=(args.dtype in ["float16", "bfloat16"]))
 
     # 初始化Adam优化器
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate)
 
     # ==================== 开始训练 ====================
     # 计算每个epoch的迭代次数
