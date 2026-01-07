@@ -9,6 +9,7 @@ import argparse
 from contextlib import nullcontext
 from transformers import AutoTokenizer
 import swanlab
+from loguru import logger
 from dataset import PretrainDataset
 from k_model import Transformer, ModelConfig
 
@@ -111,7 +112,7 @@ def train_epoch(epoch):
         if step % args.log_interval == 0:
             spend_time = time.time() - start_time
             # 打印训练进度信息
-            Logger(
+            logger.info(
                 "Epoch:[{}/{}]({}/{}) loss:{:.3f} lr:{:.7f} epoch_Time:{}min;".format(
                     epoch + 1,
                     args.epochs,
@@ -199,7 +200,7 @@ def init_model():
     # 多卡初始化：检查可用GPU数量并设置DataParallel
     num_gpus = torch.cuda.device_count()
     if num_gpus > 1:
-        Logger(f"Using {num_gpus} GPUs with DataParallel!")
+        logger.info(f"Using {num_gpus} GPUs with DataParallel!")
         # 使用DataParallel包装模型以支持多GPU训练
         model = torch.nn.DataParallel(model)
 
@@ -207,7 +208,7 @@ def init_model():
     model = model.to(args.device)
 
     # 计算并打印模型参数量（以百万为单位）
-    Logger(f"LLM总参数量：{count_parameters(model) / 1e6:.3f} 百万")
+    logger.info(f"LLM总参数量：{count_parameters(model) / 1e6:.3f} 百万")
     return model, tokenizer
 
 

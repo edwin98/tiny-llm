@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from contextlib import nullcontext
 
 from transformers import AutoTokenizer
+from loguru import logger
 
 from k_model import ModelConfig, Transformer
 from dataset import SFTDataset
@@ -19,11 +20,6 @@ import swanlab
 
 # 忽略警告
 warnings.filterwarnings("ignore")
-
-
-def Logger(content):
-    """日志记录器"""
-    print(content)
 
 
 def get_lr(it, all):
@@ -86,7 +82,7 @@ def train_epoch(epoch):
         # 打印日志
         if step % args.log_interval == 0:
             spend_time = time.time() - start_time
-            Logger(
+            logger.info(
                 "Epoch:[{}/{}]({}/{}) loss:{:.3f} lr:{:.7f} epoch_Time:{}min:".format(
                     epoch + 1,
                     args.epochs,
@@ -158,11 +154,11 @@ def init_model():
     # 多卡初始化
     num_gpus = torch.cuda.device_count()
     if num_gpus > 1:
-        Logger(f"Using {num_gpus} GPUs with DataParallel!")
+        logger.info(f"Using {num_gpus} GPUs with DataParallel!")
         model = torch.nn.DataParallel(model)
 
     model = model.to(args.device)
-    Logger(f"LLM总参数量：{count_parameters(model) / 1e6:.3f} 百万")
+    logger.info(f"LLM总参数量：{count_parameters(model) / 1e6:.3f} 百万")
     return model, tokenizer
 
 
