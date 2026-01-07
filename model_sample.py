@@ -208,4 +208,6 @@ if __name__ == "__main__":
             max_new_tokens=128,
             temperature=0.6,
         )
-        print(f"\nSample {i+1}:\nQuestion: {sft_prompt_datas[i]} \nAI answer: {samples[0]}\n{'-'*20}")  # 打印生成的样本并用分隔线分割
+        print(
+            f"\nSample {i + 1}:\nQuestion: {sft_prompt_datas[i]} \nAI answer: {samples[0]}\n{'-' * 20}"
+        )  # 打印生成的样本并用分隔线分割

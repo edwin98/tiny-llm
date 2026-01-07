@@ -13,7 +13,6 @@ from dataset import PretrainDataset
 from k_model import Transformer, ModelConfig
 
 
-
 def get_lr(it, all):
     """
     计算当前迭代的学习率，使用余弦退火调度策略

@@ -470,7 +470,7 @@ if __name__ == "__main__":
     text = f"{tokenizer.bos_token}{prompt}{tokenizer.eos_token}"
     print(f"Input text: {text}")
 
-    input_id = tokenizer(text).data['input_ids']
+    input_id = tokenizer(text).data["input_ids"]
     print("input_ids :", input_id)
     print("decode_str :", tokenizer.decode(input_id))
 
