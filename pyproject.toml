@@ -5,12 +5,53 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "datasets>=4.4.2",
+    "numpy",
+    "transformers>=4.30.0",
+    "datasets",
+    "peft",
+    "accelerate",
+    "bitsandbytes",
+    "sentencepiece",
+    "scipy",
+    "rouge-score",
+    "evaluate",
+    "tqdm",
     "loguru",
-    "modelscope>=1.33.0",
-    "numpy>=2.4.0",
-    "swanlab>=0.7.6",
-    "tokenizers>=0.22.2",
-    "torch>=2.9.1",
-    "transformers>=4.57.3",
 ]
+[project.optional-dependencies]
+cpu = [
+    "torch",
+    "torchvision",
+]
+cu126 = [
+    "torch",
+    "torchvision",
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "cpu" },
+        { extra = "cu126" },
+    ],
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+torchvision = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
