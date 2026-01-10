@@ -27,8 +27,6 @@ dataset/
 *.safetensors
 
 # 模型文件
-qwen/qwen2.5-*/
-tokenizer_*/
 output/
 
 # Markdown (保留重要文档)
