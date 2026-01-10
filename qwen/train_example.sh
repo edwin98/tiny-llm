@@ -19,6 +19,7 @@ python pretrain.py \
     --warmup_ratio 0.05 \
     --weight_decay 0.01 \
     --logging_steps 10 \
+    --max_steps 10000 \
     --save_steps 500 \
     --save_total_limit 3 \
     --eval_strategy steps \

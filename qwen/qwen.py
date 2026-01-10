@@ -4,6 +4,7 @@ from datasets import load_dataset
 
 tokenizer = AutoTokenizer.from_pretrained("qwen2.5-1.5B")
 model = AutoModelForCausalLM.from_pretrained("qwen2.5-1.5B")
+print(tokenizer.is_fast)
 print(model)
 messages = [
     {"role": "user", "content": "Who are you?"},

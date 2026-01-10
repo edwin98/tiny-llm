@@ -70,6 +70,9 @@ class DataTrainingArguments:
         default=None,
         metadata={"help": "预处理使用线程数."},
     )
+    eval_samples: Optional[int] = field(
+        default=2000, metadata={"help": "Streaming 模式下验证集样本数（take 前 N 条）"}
+    )
 
 
 # 自定义 Callback：记录 Perplexity
@@ -154,88 +157,82 @@ else:
 logger.info(f"Tokenizer 初始化完成: {tokenizer}")
 
 
-# 加载数据集
 logger.info(f"开始加载数据集: {data_args.train_files}")
-raw_datasets = load_dataset("json", data_files=data_args.train_files, split="train")
-logger.info(f"数据集加载完成，共 {len(raw_datasets)} 条数据")
+raw_datasets = load_dataset("json", data_files=data_args.train_files, split="train", streaming=True)
+logger.info("数据集加载完成（流式模式）")
 
 
 # 数据预处理函数
 def tokenize_function(examples):
     """对文本进行 tokenize"""
-    output = tokenizer(examples["text"])
+    output = tokenizer(examples["text"],truncation=False,return_attention_mask=True)
     return output
 
 
-# 对数据集进行 tokenize
+# 对数据集进行 tokenize（流式模式不支持 num_proc）
 logger.info("开始对数据集进行 tokenize")
 column_names = list(raw_datasets.features)
 tokenized_datasets = raw_datasets.map(
     tokenize_function,
     batched=True,
-    num_proc=data_args.preprocessing_num_workers,
     remove_columns=column_names,
-    desc="Running tokenizer on dataset",
 )
-logger.info(f"Tokenize 完成")
+logger.info("Tokenize 完成")
 
 
 # 将文本拼接成固定长度的文本段
-def group_texts(examples):
-    """将文本段拼接成固定长度的块"""
-    # 获取块长度
-    block_size = data_args.block_size
-    if block_size is None:
-        block_size = tokenizer.model_max_length
-        if block_size > 2048:
-            logger.warning(
-                f"tokenizer 的 model_max_length ({block_size}) 过大，设置为 2048"
-            )
-            block_size = 2048
-
-    # 将文本段拼接起来
-    concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-    # 计算拼起来的整体长度
-    total_length = len(concatenated_examples[list(examples.keys())[0]])
-    # 如果长度太长，进行分块
-    if total_length >= block_size:
-        total_length = (total_length // block_size) * block_size
-    # 按 block_size 进行切分
-    result = {
-        k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
-        for k, t in concatenated_examples.items()
+def stream_group_texts(dataset, block_size: int):
+    """
+    将 streaming tokenized dataset 拼接成固定 block_size，并生成 labels
+    返回一个新的 iterable dataset
+    """
+    buffer = {
+        "input_ids": [],
+        "attention_mask": [],
     }
-    # CLM 任务，labels 和 input 是相同的
-    result["labels"] = result["input_ids"].copy()
-    return result
+
+    def gen():
+        nonlocal buffer
+        for ex in dataset:
+            # ex: {'input_ids': [...], 'attention_mask': [...]}
+            buffer["input_ids"].extend(ex["input_ids"])
+            buffer["attention_mask"].extend(ex["attention_mask"])
+
+            while len(buffer["input_ids"]) >= block_size:
+                input_ids = buffer["input_ids"][:block_size]
+                attention_mask = buffer["attention_mask"][:block_size]
+
+                buffer["input_ids"] = buffer["input_ids"][block_size:]
+                buffer["attention_mask"] = buffer["attention_mask"][block_size:]
+
+                yield {
+                    "input_ids": input_ids,
+                    "attention_mask": attention_mask,
+                    "labels": input_ids.copy(),  # CLM
+                }
+
+    return datasets.IterableDataset.from_generator(gen)
+
 
 
 # 批量处理
 logger.info(f"开始将文本拼接成固定长度的块 (block_size={data_args.block_size})")
-lm_datasets = tokenized_datasets.map(
-    group_texts,
-    batched=True,
-    num_proc=data_args.preprocessing_num_workers,
-    load_from_cache_file=True,
-    desc=f"Grouping texts in chunks of {data_args.block_size}",
-)
+lm_datasets = stream_group_texts(tokenized_datasets, block_size=data_args.block_size)
 
-# 切分训练集和验证集
-if data_args.validation_split_percentage > 0:
-    logger.info(f"切分验证集，占比 {data_args.validation_split_percentage}%")
-    split_dataset = lm_datasets.train_test_split(
-        test_size=data_args.validation_split_percentage / 100,
-        seed=42,
-    )
-    train_dataset = split_dataset["train"]
-    eval_dataset = split_dataset["test"]
-    logger.info(
-        f"数据集切分完成 - 训练集: {len(train_dataset)} 条, 验证集: {len(eval_dataset)} 条"
-    )
+# 切分训练集和验证集（Streaming：用 take/skip）
+eval_dataset = None
+train_dataset = lm_datasets
+
+if data_args.validation_split_percentage and data_args.validation_split_percentage > 0:
+    # Streaming 下无法按百分比切分，改为固定验证条数
+    eval_samples = 2000  # ✅ 你也可以改成参数
+    logger.info(f"Streaming 验证集：take 前 {eval_samples} 个样本作为 eval")
+    eval_dataset = lm_datasets.take(eval_samples)
+    train_dataset = lm_datasets.skip(eval_samples)
 else:
-    train_dataset = lm_datasets
-    eval_dataset = None
-    logger.info(f"数据处理完成，共 {len(train_dataset)} 个 batch，无验证集")
+    logger.info("Streaming 模式：不使用验证集")
+
+logger.info("数据集准备完成（Streaming）")
 
 
 logger.info("初始化 Trainer")
