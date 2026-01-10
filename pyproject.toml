@@ -18,6 +18,10 @@ dependencies = [
     "tqdm",
     "loguru",
     "swanlab>=0.7.6",
+    "hf-xet>=1.2.0",
+    "notebook>=7.5.1",
+    "torchdata>=0.11.0",
+    "torchvision[cu126,pytorch-cu126]>=0.24.1",
 ]
 [project.optional-dependencies]
 cpu = [

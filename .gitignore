@@ -22,4 +22,15 @@ wheels/
 # uv lock file (keep in git for reproducibility)
 # uv.lock
 
-*.json
+# 数据集和大文件
+dataset/
+*.safetensors
+
+# 模型文件
+qwen/qwen2.5-*/
+tokenizer_*/
+output/
+
+# Markdown (保留重要文档)
+*.md
+!README_TRAINING.md
