@@ -10,7 +10,6 @@ python pretrain.py \
     --block_size 2048 \
     --preprocessing_num_workers 10 \
     --output_dir output/pretrain_with_eval \
-    --num_train_epochs 3 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 4 \
