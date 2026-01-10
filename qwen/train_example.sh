@@ -28,5 +28,5 @@ python pretrain.py \
     --greater_is_better False \
     --bf16 \
     --gradient_checkpointing \
-    --report_to tensorboard \
+    --report_to swanlab \
     --ddp_find_unused_parameters False
