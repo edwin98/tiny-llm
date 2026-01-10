@@ -4,6 +4,7 @@
 
 deepspeed --num_gpus=2 pretrain.py \
     --deepspeed ds_config_zero2.json \
+    --config_name qwen2.5-1.5B \
     --model_name_or_path qwen2.5-1.5B \
     --train_files ../dataset/mobvoi_seq_monkey_general_open_corpus.jsonl \
     --validation_split_percentage 5 \

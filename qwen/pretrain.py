@@ -171,11 +171,10 @@ def tokenize_function(examples):
 
 # 对数据集进行 tokenize（流式模式不支持 num_proc）
 logger.info("开始对数据集进行 tokenize")
-column_names = list(raw_datasets.features)
 tokenized_datasets = raw_datasets.map(
     tokenize_function,
     batched=True,
-    remove_columns=column_names,
+    remove_columns=["text"],
 )
 logger.info("Tokenize 完成")
 
