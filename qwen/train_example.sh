@@ -8,7 +8,6 @@ python pretrain.py \
     --train_files /root/autodl-tmp/mobvoi_seq_monkey_general_open_corpus.jsonl \
     --validation_split_percentage 5 \
     --block_size 2048 \
-    --preprocessing_num_workers 10 \
     --output_dir output/pretrain_with_eval \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \

@@ -6,13 +6,11 @@ deepspeed --num_gpus=2 pretrain.py \
     --deepspeed ds_config_zero2.json \
     --config_name qwen2.5-1.5B \
     --model_name_or_path qwen2.5-1.5B \
-    --config_name qwen2.5-1.5B \
     --train_files /root/autodl-tmp/mobvoi_seq_monkey_general_open_corpus.jsonl \
     --validation_split_percentage 5 \
     --block_size 2048 \
-    --preprocessing_num_workers 10 \
     --output_dir output/pretrain_with_eval \
-    --per_device_train_batch_size 4 \
+    --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 4 \
     --learning_rate 1e-4 \
