@@ -4,7 +4,8 @@
 
 python pretrain.py \
     --model_name_or_path qwen2.5-1.5B \
-    --train_files /root/autodl-tmp/dataset/mobvoi_seq_monkey_general_open_corpus.jsonl \
+    --config_name qwen2.5-1.5B \
+    --train_files /root/autodl-tmp/mobvoi_seq_monkey_general_open_corpus.jsonl \
     --validation_split_percentage 5 \
     --block_size 2048 \
     --preprocessing_num_workers 10 \
