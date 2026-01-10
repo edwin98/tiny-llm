@@ -20,10 +20,10 @@ python pretrain.py \
     --logging_steps 10 \
     --save_steps 500 \
     --save_total_limit 3 \
-    --evaluation_strategy steps \
+    --eval_strategy steps \
     --eval_steps 500 \
     --eval_accumulation_steps 10 \
-    --load_best_model_at_end \
+    --load_best_model_at_end False \
     --metric_for_best_model eval_loss \
     --greater_is_better False \
     --bf16 \

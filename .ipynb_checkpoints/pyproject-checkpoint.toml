@@ -1,0 +1,63 @@
+[project]
+name = "tiny-llm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "transformers>=4.30.0",
+    "datasets",
+    "peft",
+    "accelerate",
+    "bitsandbytes",
+    "sentencepiece",
+    "scipy",
+    "rouge-score",
+    "evaluate",
+    "tqdm",
+    "loguru",
+    "swanlab>=0.7.6",
+    "hf-xet>=1.2.0",
+    "notebook>=7.5.1",
+    "torchdata>=0.11.0",
+    "torchvision[cu126,pytorch-cu126]>=0.24.1",
+    "deepspeed>=0.18.4",
+]
+[project.optional-dependencies]
+cpu = [
+    "torch",
+    "torchvision",
+]
+cu126 = [
+    "torch",
+    "torchvision",
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "cpu" },
+        { extra = "cu126" },
+    ],
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+torchvision = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu126", extra = "cu126" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
