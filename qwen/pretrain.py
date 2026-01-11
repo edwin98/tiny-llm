@@ -69,6 +69,9 @@ class DataTrainingArguments:
     eval_samples: Optional[int] = field(
         default=100000, metadata={"help": "Streaming 模式下验证集样本数（take 前 N 条）"}
     )
+    validation_split: Optional[bool] = field(
+        default=False, metadata={"help": "是否在流式数据集中划分验证集"}
+    )
 
 
 # 自定义 Callback：记录 Perplexity
@@ -218,12 +221,11 @@ lm_datasets = stream_group_texts(tokenized_datasets, block_size=data_args.block_
 eval_dataset = None
 train_dataset = lm_datasets
 
-if data_args.validation_split_percentage and data_args.validation_split_percentage > 0:
+if data_args.validation_split:
     # Streaming 下无法按百分比切分，改为固定验证条数
-    eval_samples = 2000  # ✅ 你也可以改成参数
-    logger.info(f"Streaming 验证集：take 前 {eval_samples} 个样本作为 eval")
-    eval_dataset = lm_datasets.take(eval_samples)
-    train_dataset = lm_datasets.skip(eval_samples)
+    logger.info(f"Streaming 验证集：take 前 {data_args.eval_samples} 个样本作为 eval")
+    eval_dataset = lm_datasets.take(data_args.eval_samples)
+    train_dataset = lm_datasets.skip(data_args.eval_samples)
 else:
     logger.info("Streaming 模式：不使用验证集")
 
