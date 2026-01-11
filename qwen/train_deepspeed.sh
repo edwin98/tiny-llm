@@ -9,9 +9,10 @@ deepspeed --num_gpus=2 pretrain.py \
     --train_files /root/autodl-tmp/mobvoi_seq_monkey_general_open_corpus.jsonl \
     --validation_split_percentage 5 \
     --block_size 2048 \
+    --save_only_model True \
     --output_dir output/pretrain_with_eval \
     --per_device_train_batch_size 16 \
-    --per_device_eval_batch_size 4 \
+    --per_device_eval_batch_size 8 \
     --gradient_accumulation_steps 4 \
     --learning_rate 1e-4 \
     --lr_scheduler_type cosine \
@@ -20,7 +21,7 @@ deepspeed --num_gpus=2 pretrain.py \
     --logging_steps 10 \
     --max_steps 10000 \
     --save_steps 500 \
-    --save_total_limit 3 \
+    --save_total_limit 1 \
     --eval_strategy steps \
     --eval_steps 500 \
     --eval_accumulation_steps 10 \

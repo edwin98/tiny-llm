@@ -58,10 +58,6 @@ class DataTrainingArguments:
     train_files: Optional[List[str]] = field(
         default=None, metadata={"help": "训练数据路径"}
     )
-    validation_split_percentage: Optional[int] = field(
-        default=5,
-        metadata={"help": "验证集占比（百分比），默认 5%"},
-    )
     block_size: Optional[int] = field(
         default=None,
         metadata={"help": ("设置的文本块长度")},
@@ -71,7 +67,7 @@ class DataTrainingArguments:
         metadata={"help": "预处理使用线程数."},
     )
     eval_samples: Optional[int] = field(
-        default=2000, metadata={"help": "Streaming 模式下验证集样本数（take 前 N 条）"}
+        default=100000, metadata={"help": "Streaming 模式下验证集样本数（take 前 N 条）"}
     )
 
 
